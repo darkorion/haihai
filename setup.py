@@ -5,6 +5,6 @@ sys.argv.append('py2exe')
 
 setup(
     options = {'py2exe': {'bundle_files': 1}},
-    windows = [{'script': "haihai.py"}],
+    console = [{'script': "haihai.py"}],
     zipfile = None,
 )

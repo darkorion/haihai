@@ -107,5 +107,7 @@ def job_file(main_dir, d, f):
 job("10bit", None)
 
 # delete leftovers
-os.remove("video.264")
-os.remove("video.8bit.264")
+if os.path.exists("video.264"):
+    os.remove("video.264")
+if os.path.exists("video.8bit.264"):
+    os.remove("video.8bit.264")
