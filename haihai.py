@@ -1,6 +1,18 @@
-﻿import subprocess
+﻿'''
+This is haihai.py, a script to transcode Hi10P MKV videos to HiP suitable for hardware players.
+'''
+import subprocess
 import os
 import copy
+
+__author__ = "Tewi Inaba"
+__copyright__ = "2012"
+__credits__ = ["Tewi Inaba"]
+__license__ = "New BSD"
+__version__ = "1.0"
+__maintainer__ = "Tewi Inaba"
+__email__ = "tewi@konousa.ru"
+__status__ = "Development"
 
 # subprocess commands
 # list of two lists: indexes of substituted arguments, arguments itself
