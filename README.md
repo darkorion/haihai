@@ -23,4 +23,4 @@ Install py2exe for python and generate haihai.exe for use w/o Python via setup.p
 What's with the name?
 ======
 
-Roughly Japanese “yesyes”, comes from _Hi_10P+_Hi_P
+Roughly Japanese “yesyes”, comes from **Hi**10P+**Hi**P
