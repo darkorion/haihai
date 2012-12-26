@@ -17,9 +17,10 @@ Options
 ======
 
 You can play with x264 settings to produce different quality files
+
 Install py2exe for python and generate haihai.exe for use w/o Python via setup.py py2exe
 
 What's with the name?
 ======
 
-Roughly Japanese “yesyes”, comes from *Hi*10P+*Hi*P
+Roughly Japanese “yesyes”, comes from _Hi_10P+_Hi_P
