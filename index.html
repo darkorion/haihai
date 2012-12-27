@@ -42,51 +42,76 @@
 
 <p>Script to convert H264 Hi10P MKV to HiP MKV preserving original MKV content (except for original video track of course).</p>
 
+<p>Nice page <a href="http://fuwaneko.github.com/haihai/">here</a>.</p>
+
 <h1>Discussion</h1>
 
 <p><a href="https://plus.google.com/107252355899172817272">On Google+</a></p>
 
-<h1>Issues</h1>
+<h1>FFMpeg branch</h1>
 
-<p>Script assumes that video track in MKV has index of 0. Will be fixed soon.</p>
+<p>Now FFMpeg branch is available for Windows/Linux/MacOSX users.</p>
+
+<ol>
+<li>Clone FFMpeg branch or download archive and extract it.</li>
+<li>Get FFMpeg. Linux users already have it or can use package manager. Windows users can download <strong>static</strong> build <a href="http://ffmpeg.zeranoe.com/builds/">here</a>, extract ffmpeg.exe near haihai.py.</li>
+<li>Get Python. Linux users already have it or can use package manager. Windows users can download <a href="http://www.python.org">here</a>.</li>
+<li>Put videos into 10bit folder near haihai.py with any folder structure you want.</li>
+<li>Open command-line prompt.</li>
+<li>Run haihai.py --help to see available options.</li>
+<li>Run haihai.py if you're okay with defaults or provide your options.</li>
+</ol><p>FFMpeg branch does not show encoding progress, but you can remove “-loglevel error” and turn it on.</p>
+
+<p>FFMpeg branch will not become main, as I prefer x264 and stuff. But it will be updated with new features, probably ones I don't need, but you requested.</p>
+
+<p>Main branch will remain Windows-only from now on and probably will not be updated, as I am fully satisfied with it.</p>
+
+<p>Mac OS X users can also download ffmpeg binaries for Mac and use FFMpeg branch script. Python is installed by default in Mac OS X.</p>
+
+<p>In theory it's possible to use FFMpeg branch even on smartphones/tablets with ARM processors. But encoding will bee sllloooooooowwwwww.</p>
 
 <h1>Installation</h1>
 
+<p>For main branch only (Windows).</p>
+
 <ol>
-<li>Get Python, get mkvtoolnix, get mkvfps.exe from <a href="http://konousa.ru/mkvfps.exe">here</a>, get x264 8-bit version</li>
-<li>Clone repo</li>
-<li>Put mkvtoolnix exes to mkvtoolnix subfolder</li>
-<li>Put x264.exe near haihai.py</li>
-<li>Put some Hi10P files into 10bit subfolder</li>
-<li>Run haihai.py</li>
+<li>Get <a href="http://www.python.org">Python</a>, get <a href="http://www.bunkus.org/videotools/mkvtoolnix/">mkvtoolnix</a>, get mkvfps.exe from <a href="http://konousa.ru/mkvfps.exe">here</a>, get <a href="http://www.x264.nl">x264 8-bit version</a>.</li>
+<li>Clone main branch.</li>
+<li>Put mkvtoolnix exes to mkvtoolnix subfolder.</li>
+<li>Put x264.exe near haihai.py.</li>
+<li>Put some Hi10P files into 10bit subfolder.</li>
+<li>Run haihai.py.</li>
 </ol><h1>Fuck this, I want binaries!</h1>
 
-<p>No problem, get it <a href="http://konousa.ru/10to8.7z">here</a>.</p>
+<p><a href="http://konousa.ru/10to8.7z">For Windows only</a>, other OSes don't need binaries.</p>
 
-<ol>
-<li>Put videos into 10bit folder (create it)</li>
-<li>Run haihai.exe and you're good</li>
-</ol><h1>Linux?</h1>
+<h2>Whaaa, I can't unpack!</h2>
 
-<p>Soon. For now you can use Wine — it works.</p>
+<p>Use <a href="http://www.7-zip.org">7-zip</a> and stop pirating WinRAR.</p>
+
+<h1>Linux/MacOSX?</h1>
+
+<p>Yes, see FFMpeg branch.</p>
 
 <h1>Advanced</h1>
 
 <p>You can put Hi10P in subfolders and script will preserve them. That's what it was created for :)</p>
 
+<p>You can select different encoding options for x264:</p>
+
+<ul>
+<li>--preset (ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow, placebo), defines overall quality. Slower means better. Default is fast.</li>
+<li>--crf (0-50), defines constant quality. Lower is better, 0 is lossless (not recommended). Default is 20.</li>
+<li>--tune (film, animation, grain, stillimage, psnr, ssim, fastdecode, zerolatency), source optimizations. Default is animation.</li>
+</ul><p>On Windows install py2exe for python and generate haihai.exe for use w/o Python via setup.py py2exe.</p>
+
 <h1>Gui?</h1>
 
 <p>No. This is batch processing script made to be as autonomous as possible (run and forget). Gui is not needed.</p>
 
-<h1>Options</h1>
-
-<p>You can play with x264 settings to produce different quality files</p>
-
-<p>Install py2exe for python and generate haihai.exe for use w/o Python via setup.py py2exe</p>
-
 <h1>What's with the name?</h1>
 
-<p>Roughly Japanese “yesyes”, comes from <strong>Hi</strong>10P + <strong>Hi</strong>P.</p>
+<p>Roughly Japanese “yesyes” (but actually means nothing :), comes from <strong>Hi</strong>10P + <strong>Hi</strong>P.</p>
       </section>
 
     </div>
