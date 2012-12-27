@@ -20,13 +20,13 @@ __status__ = "Development"
 
 # subprocess commands
 # list of two lists: indexes of substituted arguments, arguments itself
-# extract video track from mkv, assumes that there is only one track and it has index of 0
-extract_cmd = [[2], ["mkvtoolnix/mkvextract.exe", "tracks", "%s", "0:video.264"]]
+# extract video track from mkv, assumes that there is only one video track
+extract_cmd = [[2, 3], ["mkvtoolnix/mkvextract.exe", "tracks", "%s", "%s:video.264"]]
 # encodes video track using 8-bit x264.exe, you can switch it with 10-bit exe and get symmetrical script that will transcode 8-bit to 10-bit :)
 encode_cmd = [[8], ['x264.exe', '--preset', '%s', '--tune', '%s', '--crf', '%i', '--fps', '%s', '-o', 'video.8bit.264', 'video.264']]
 # merges transcoded video track into source mkv, removing old one
-merge_cmd = [[2, 5], ['mkvtoolnix/mkvmerge.exe', '-o', '%s', '-d', '!0', '%s', 'video.8bit.264']]
-# gets video track fps, assumptions are the same as in extract_cmd
+merge_cmd = [[2, 4, 5], ['mkvtoolnix/mkvmerge.exe', '-o', '%s', '-d', '!%s', '%s', 'video.8bit.264']]
+# gets video track fps and video track number
 getfps_cmd = [[1], ["mkvtoolnix/mkvfps.exe", "%s"]]
 
 
@@ -102,22 +102,23 @@ def job_file(main_dir, d, f):
         print "Output file exists, skip"
         return
 
-    # get fps
+    # get fps and track number
     # this is important, because x264.exe assumes 25 fps by default, and you MUST supply correct fps if you want syncronized a/v
     fps = run_cmd(getfps_cmd, [os.path.abspath(work_file)])
-    fps = fps.strip()
+    # fps is [track, fps]
+    fps = fps.strip().split(" ")
     
     # extract video track for re-encoding
     print "Extracting"
-    run_cmd(extract_cmd, [os.path.abspath(work_file)])
+    run_cmd(extract_cmd, [os.path.abspath(work_file), fps[0]])
     
     # encode video track, which is a long process, but we are patient, aren't we? :)
     print "Encoding (please, be patient)"
-    run_cmd(encode_cmd, [fps])
+    run_cmd(encode_cmd, [fps[1]])
     
     # merge video track back, wiping old one
     print "Merging"
-    run_cmd(merge_cmd, [output_file, work_file])
+    run_cmd(merge_cmd, [output_file, fps[0], work_file])
 
 def main():
     '''
