@@ -3,62 +3,56 @@
 
 '''
 This is haihai.py, a script to transcode Hi10P MKV videos to HiP suitable for hardware players.
+FFMpeg branch, multiplatform
 '''
 import subprocess
 import os
 import copy
 import argparse
+import shlex
 
 __author__ = "Tewi Inaba"
 __copyright__ = "2012"
 __credits__ = ["Tewi Inaba"]
 __license__ = "New BSD"
-__version__ = "1.1"
+__version__ = "1.2-ffmpeg"
 __maintainer__ = "Tewi Inaba"
 __email__ = "tewi@konousa.ru"
 __status__ = "Development"
 
 # subprocess commands
-# list of two lists: indexes of substituted arguments, arguments itself
-# extract video track from mkv, assumes that there is only one track and it has index of 0
-extract_cmd = [[2], ["mkvtoolnix/mkvextract.exe", "tracks", "%s", "0:video.264"]]
-# encodes video track using 8-bit x264.exe, you can switch it with 10-bit exe and get symmetrical script that will transcode 8-bit to 10-bit :)
-encode_cmd = [[8], ['x264.exe', '--preset', '%s', '--tune', '%s', '--crf', '%i', '--fps', '%s', '-o', 'video.8bit.264', 'video.264']]
-# merges transcoded video track into source mkv, removing old one
-merge_cmd = [[2, 5], ['mkvtoolnix/mkvmerge.exe', '-o', '%s', '-d', '!0', '%s', 'video.8bit.264']]
-# gets video track fps, assumptions are the same as in extract_cmd
-getfps_cmd = [[1], ["mkvtoolnix/mkvfps.exe", "%s"]]
-
+# encodes video track using ffmpeg
+encode_cmd = ""
+if os.name == "nt":
+    encode_cmd = 'ffmpeg.exe -i "%s" -map 0 -c copy -c:v libx264 -preset %s -crf %d -tune %s "%s" -threads 0 -loglevel error'
+else:
+    encode_cmd = 'ffmpeg -i %s -map 0 -c copy -c:v libx264 -preset %s -crf %d -tune %s %s -threads 0 -loglevel error'
 
 def run_cmd(cmd, params):
     '''
         Runs external system command with parameters and without spawning window on Windows OSes
-        cmd shoud be list of two lists:
-         - first list contains indexes of substituted arguments
-         - second list contains list of arguments
-        params is a list of parameters that will be used as substitutions
+        cmd shoud be string
+        params is a list/tuple of parameters that will be used as substitutions
     '''
-    command = copy.deepcopy(cmd)
-    j = 0
-    for i in command[0]:
-        command[1][i] = command[1][i] % params[j]
-        j += 1
+    command = cmd % tuple(params)
+    print command
 
     # for Windows: disable window spawning, this also makes x264.exe output into console in which python runs — very convenient
     startupinfo = None
     if os.name == 'nt':
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    process = subprocess.Popen(command[1], stdout=subprocess.PIPE, startupinfo=startupinfo)
+    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, startupinfo=startupinfo)
     
     # we get all output from command and return it
     result = process.communicate()[0]
     return result
 
-def job(main_dir, d = None):
+def job(main_dir, d = None, args = ()):
     '''
         Does recursive folder search, finds all MKV files and processes them
         main_dir - a dir where to start search
+        args - settings for encoder
         d - None on first call, or any subfolder to limit recursion there
     '''
     if d is not None:
@@ -77,11 +71,11 @@ def job(main_dir, d = None):
             else:
                 job_dir = item
 
-            job(main_dir, job_dir)
+            job(main_dir, job_dir, args)
         else:
-            job_file(main_dir, d, item)
+            job_file(main_dir, d, item, args)
 
-def job_file(main_dir, d, f):
+def job_file(main_dir, d, f, args):
     '''
         Transcodes a single file
         main_dir - see job
@@ -102,22 +96,9 @@ def job_file(main_dir, d, f):
         print "Output file exists, skip"
         return
 
-    # get fps
-    # this is important, because x264.exe assumes 25 fps by default, and you MUST supply correct fps if you want syncronized a/v
-    fps = run_cmd(getfps_cmd, [os.path.abspath(work_file)])
-    fps = fps.strip()
-    
-    # extract video track for re-encoding
-    print "Extracting"
-    run_cmd(extract_cmd, [os.path.abspath(work_file)])
-    
     # encode video track, which is a long process, but we are patient, aren't we? :)
     print "Encoding (please, be patient)"
-    run_cmd(encode_cmd, [fps])
-    
-    # merge video track back, wiping old one
-    print "Merging"
-    run_cmd(merge_cmd, [output_file, work_file])
+    run_cmd(encode_cmd, (os.path.abspath(work_file), args.preset, args.crf, args.tune, os.path.abspath(output_file)))
 
 def main():
     '''
@@ -130,26 +111,15 @@ def main():
     # parse arguments
     parser = argparse.ArgumentParser(description='Transcode Hi10P to HiP.')
     parser.add_argument('--crf', metavar='crf', type=int, default=20,
-                       help='basic quality parameter, lower is better, 24 considered default by x264, 20 is default in haihai')
+                       help='basic quality parameter, lower is better, 24 considered default by libx264, 20 is default in haihai')
     parser.add_argument('--tune', dest='tune', type=str, default="animation",
-                       help='tune x264 for specific content, default is animation, see x264 help for more')
+                       help='tune libx264 for specific content, default is animation, see libx264 help for more')
     parser.add_argument('--preset', dest='preset', type=str, default="fast",
-                       help='x264 preset, default is fast, for low-quality source use medium or slow')
+                       help='libx264 preset, default is fast, for low-quality source use medium or slow')
 
     args = parser.parse_args()
 
-    # build encode command based on arguments
-    encode_cmd[1][2] = encode_cmd[1][2] % args.preset
-    encode_cmd[1][4] = encode_cmd[1][4] % args.tune
-    encode_cmd[1][6] = encode_cmd[1][6] % args.crf
-
-    job("10bit", None)
-
-    # delete leftovers
-    if os.path.exists("video.264"):
-        os.remove("video.264")
-    if os.path.exists("video.8bit.264"):
-        os.remove("video.8bit.264")
+    job("10bit", args=args)
 
 # you can import this module and call module functions from your scripts now
 if __name__ == "__main__":
