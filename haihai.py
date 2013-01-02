@@ -8,6 +8,7 @@ import subprocess
 import os
 import copy
 import argparse
+from decimal import *
 
 __author__ = "Tewi Inaba"
 __copyright__ = "2012"
@@ -49,6 +50,7 @@ def run_cmd(cmd, params):
     if os.name == 'nt':
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    print(" ".join(command[1]))
     process = subprocess.Popen(command[1], stdout=subprocess.PIPE, startupinfo=startupinfo)
     
     # we get all output from command and return it
@@ -66,7 +68,7 @@ def job(main_dir, d = None):
     else:
         work_dir = main_dir
 
-    print work_dir
+    print (work_dir)
 
     items = os.listdir(work_dir)
 
@@ -96,28 +98,29 @@ def job_file(main_dir, d, f):
         output_file = os.path.join("8bit", d, f)
 
     output_file = output_file.replace("_", " ")
-    print "Encoding", work_file, "to", output_file
+    print ("Encoding", work_file, "to", output_file)
 
     if os.path.exists(output_file):
-        print "Output file exists, skip"
+        print ("Output file exists, skip")
         return
 
     # get fps and track number
     # this is important, because x264.exe assumes 25 fps by default, and you MUST supply correct fps if you want syncronized a/v
     fps = run_cmd(getfps_cmd, [os.path.abspath(work_file)])
     # fps is [track, fps]
-    fps = fps.strip().split(" ")
+    fps = str(fps).strip().replace("'","").replace("b","").split(" ")
     
     # extract video track for re-encoding
-    print "Extracting"
+    print ("Extracting")
     run_cmd(extract_cmd, [os.path.abspath(work_file), fps[0]])
-    
+
     # encode video track, which is a long process, but we are patient, aren't we? :)
-    print "Encoding (please, be patient)"
+    print ("Encoding (please, be patient)")
+    print (encode_cmd)
     run_cmd(encode_cmd, [fps[1]])
     
     # merge video track back, wiping old one
-    print "Merging"
+    print ("Merging")
     run_cmd(merge_cmd, [output_file, fps[0], work_file])
 
 def main():
