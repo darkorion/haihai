@@ -116,7 +116,7 @@ def job_file(main_dir, d, f):
 
     # encode video track, which is a long process, but we are patient, aren't we? :)
     print ("Encoding (please, be patient)")
-    print (encode_cmd)
+
     run_cmd(encode_cmd, [fps[1]])
     
     # merge video track back, wiping old one
