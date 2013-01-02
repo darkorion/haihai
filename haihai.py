@@ -35,7 +35,6 @@ def run_cmd(cmd, params):
         params is a list/tuple of parameters that will be used as substitutions
     '''
     command = cmd % tuple(params)
-    print command
 
     # for Windows: disable window spawning, this also makes x264.exe output into console in which python runs — very convenient
     startupinfo = None
@@ -90,10 +89,10 @@ def job_file(main_dir, d, f, args):
         output_file = os.path.join("8bit", d, f)
 
     output_file = output_file.replace("_", " ")
-    print "Encoding", work_file, "to", output_file
+    print("Encoding", work_file, "to", output_file)
 
     if os.path.exists(output_file):
-        print "Output file exists, skip"
+        print("Output file exists, skip")
         return
 
     # encode video track, which is a long process, but we are patient, aren't we? :)
