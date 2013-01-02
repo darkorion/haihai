@@ -59,7 +59,7 @@ def job(main_dir, d = None, args = ()):
     else:
         work_dir = main_dir
 
-    print work_dir
+    print(work_dir)
 
     items = os.listdir(work_dir)
 
@@ -96,7 +96,7 @@ def job_file(main_dir, d, f, args):
         return
 
     # encode video track, which is a long process, but we are patient, aren't we? :)
-    print "Encoding (please, be patient)"
+    print("Encoding (please, be patient)")
     run_cmd(encode_cmd, (os.path.abspath(work_file), args.preset, args.crf, args.tune, os.path.abspath(output_file)))
 
 def main():
